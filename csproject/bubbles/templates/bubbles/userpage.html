@@ -1,0 +1,84 @@
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial;
+        padding: 20px;
+        background: #f1f1f1;
+    }
+
+    /* Header/Blog Title */
+    .header {
+        padding: 30px;
+        font-size: 40px;
+        text-align: center;
+        background: white;
+    }
+
+    /* Create two unequal columns that floats next to each other */
+    /* Left column */
+    .leftcolumn {
+        float: left;
+        width: 75%;
+    }
+
+    /* Right column */
+    .rightcolumn {
+        float: left;
+        width: 25%;
+        padding-left: 20px;
+    }
+
+    /* Add a card effect for articles */
+    .card {
+        background-color: white;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+
+    /* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
+    @media screen and (max-width: 800px) {
+
+        .leftcolumn,
+        .rightcolumn {
+            width: 100%;
+            padding: 0;
+        }
+    }
+</style>
+
+<div class="row">
+    <div class="leftcolumn">
+        {% if user_bubbles %}
+        {% for bubble in user_bubbles %}
+        <div class="card">
+            <h5>Published on {{ bubble.pub_time }} by {{ bubble.author }}</h5>
+            <p>{{ bubble.bubble_text }}</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="card">
+            <p>You have not posted any bubbles yet</p>
+        </div>
+        {% endif %}
+    </div>
+    <div class="rightcolumn">
+        <div class="card">
+            <p>Hi {{ user }} </p>
+            <form action="{% url 'logout' %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="Logout">
+            </form>
+        </div>
+    </div>
+</div>
