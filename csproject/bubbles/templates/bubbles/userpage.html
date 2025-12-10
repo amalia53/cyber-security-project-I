@@ -9,7 +9,6 @@
         background: #f1f1f1;
     }
 
-    /* Header/Blog Title */
     .header {
         padding: 30px;
         font-size: 40px;
@@ -17,28 +16,100 @@
         background: white;
     }
 
-    /* Create two unequal columns that floats next to each other */
-    /* Left column */
     .leftcolumn {
         float: left;
         width: 75%;
     }
 
-    /* Right column */
     .rightcolumn {
         float: left;
         width: 25%;
         padding-left: 20px;
+
     }
 
-    /* Add a card effect for articles */
     .card {
         background-color: white;
         padding: 20px;
         margin-top: 20px;
     }
 
-    /* Clear floats after the columns */
+    input[type=text] {
+        border-radius: 3px;
+        background-color: #f2f2f2;
+        box-shadow: 0px 2px 2px #d6d6d6;
+        border: none;
+        padding: 2%;
+        margin-bottom: 15px;
+        width: 250px;
+        box-sizing: border-box;
+    }
+
+    .left_column_button {
+        margin-top: 1.2em;
+        margin-bottom: 2em;
+        display: block;
+        width: 20%;
+        background-color: #33A192;
+        color: white;
+        border: none;
+        padding: .6em;
+        font-weight: 500;
+        font-size: 1.1em;
+        border-radius: 3px;
+    }
+
+    .right_column_button {
+        margin-top: 1.2em;
+        margin-bottom: 2em;
+        display: block;
+        width: 50%;
+        background-color: #33A192;
+        color: white;
+        border: none;
+        padding: .6em;
+        font-weight: 500;
+        font-size: 1.1em;
+        border-radius: 3px;
+    }
+
+    .delete_button {
+        margin-top: 1.2em;
+        margin-bottom: 2em;
+        margin-left: 1100;
+        display: block;
+        width: 6%;
+        background-color: #a13333;
+        color: white;
+        border: none;
+        padding: .2em;
+        font-weight: 500;
+        font-size: 1.0em;
+        border-radius: 3px;
+    }
+
+    input[type=password] {
+        border-radius: 3px;
+        background-color: #f2f2f2;
+        box-shadow: 0px 2px 2px #d6d6d6;
+        border: none;
+        padding: 2%;
+        margin-bottom: 15px;
+        width: 250px;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        width: 100%;
+        height: 150px;
+        padding: 12px 20px;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        background-color: #f8f8f8;
+        resize: none;
+    }
+
     .row:after {
         content: "";
         display: table;
@@ -59,25 +130,49 @@
 
 <div class="row">
     <div class="leftcolumn">
+        <div class="card">
+            <h3>Post a new Bubble</h3>
+            <form action="{% url 'post' %}" method="POST">
+                {% csrf_token %}
+                {{ post_form.as_p }}
+                <!-- <textarea id="bubble_text" name="bubble_text" placeholder="What's on your mind?"></textarea> -->
+                <input class="left_column_button" type="submit" value="Post your bubble">
+            </form>
+        </div>
         {% if user_bubbles %}
         {% for bubble in user_bubbles %}
         <div class="card">
-            <h5>Published on {{ bubble.pub_time }} by {{ bubble.author }}</h5>
+            <h5>Published on {{ bubble.pub_time }} by {{ bubble.author }} </h5>
             <p>{{ bubble.bubble_text }}</p>
+            <form action="{% url 'delete_bubble' bubble_id=bubble.id %}">
+                {% csrf_token %}
+                <input class="delete_button" type="submit" value="Delete">
+            </form>
         </div>
         {% endfor %}
         {% else %}
         <div class="card">
-            <p>You have not posted any bubbles yet</p>
+            <p>You have not posted any Bubbles yet</p>
         </div>
         {% endif %}
     </div>
     <div class="rightcolumn">
         <div class="card">
-            <p>Hi {{ user }} </p>
+            <h2>Hi {{ user }}! </h2>
+            <form action="/">
+                <input class="right_column_button" type="submit" value="Back to home">
+            </form>
             <form action="{% url 'logout' %}" method="POST">
                 {% csrf_token %}
-                <input type="submit" value="Logout">
+                <input class="right_column_button" type="submit" value="Logout">
+            </form>
+            <h3>Change your password</h3>
+            <form action="{% url 'changepw' %}" method="POST">
+                {% csrf_token %}
+                {{ change_pw_form.as_p }}
+                <!-- <label for="pw">New password:</label><br>
+                <input type="password" id="newpw" name="newpw"><br> -->
+                <input class="right_column_button" type="submit" value="Change password">
             </form>
         </div>
     </div>

@@ -38,6 +38,42 @@
         margin-top: 20px;
     }
 
+    input[type=text] {
+        border-radius: 3px;
+        background-color: #f2f2f2;
+        box-shadow: 0px 2px 2px #d6d6d6;
+        border: none;
+        padding: 2%;
+        margin-bottom: 15px;
+        width: 250px;
+        box-sizing: border-box;
+    }
+
+    input[type=password] {
+        border-radius: 3px;
+        background-color: #f2f2f2;
+        box-shadow: 0px 2px 2px #d6d6d6;
+        border: none;
+        padding: 2%;
+        margin-bottom: 15px;
+        width: 250px;
+        box-sizing: border-box;
+    }
+
+    input[type=submit] {
+        margin-top: 1.2em;
+        margin-bottom: 2em;
+        display: block;
+        width: 30%;
+        background-color: #33A192;
+        color: white;
+        border: none;
+        padding: .6em;
+        font-weight: 500;
+        font-size: 1.1em;
+        border-radius: 3px;
+    }
+
     /* Clear floats after the columns */
     .row:after {
         content: "";
@@ -59,7 +95,7 @@
 
 <div class="header">
     <h2>Welcome to Bubbles</h2>
-    <p>Share your thought bubbles</p>
+    <p>Share your Thought Bubbles</p>
 </div>
 
 <div class="row">
@@ -72,47 +108,44 @@
         </div>
         {% endfor %}
         {% else %}
-        <p>There are no bubbles yet/p>
+        <p>There are no Bubbles yet/p>
             {% endif %}
     </div>
     <div class="rightcolumn">
-        {% if user  != "guest" %}
+        {% if user != "guest" %}
         <div class="card">
-            <p>Hi {{ user }} </p>
+            <h3>Hi {{ user }}! </h3>
+            <form action="{% url 'userpage' username=user %}">
+                <input type="submit" value="My page">
+            </form>
             <form action="{% url 'logout' %}" method="POST">
                 {% csrf_token %}
                 <input type="submit" value="Logout">
             </form>
         </div>
-        <!-- <div class="card">
-            <h3>Post a new bubble/h3>
-            <form action="/post" method="post">
+        <div class="card">
+            <h3>Post a new Bubble</h3>
+            <form action="{% url 'post' %}" method="POST">
                 {% csrf_token %}
-                <label for="bubble_text">What are you thinking about?</label><br>
-                <input type="text" id="bubble_text" name="bubble_text"><br>
+                {{ post_form.as_p }}
+                <!-- <textarea id="bubble_text" name="bubble_text" rows="5" cols="42"
+                    placeholder="What's on your mind?"></textarea> -->
                 <input type="submit" value="Post">
             </form>
-        </div> -->
-        <!-- <div class="card">
-            <h3>Your Bubbles</h3>
-            {% for bubble in your_bubbles %}
-            <div class="card">
-                <p>{{ bubble.bubble_text }}</p>
-            </div>
-            {% endfor %}
-        </div> -->
+        </div>
         {% else %}
         <div class="card">
             <h3>Log in</h3>
             <form action="{% url 'login' %}" method="POST">
                 {% csrf_token %}
-                <label for="username">Username:</label><br>
+                {{ login_form.as_p }}
+                <!-- <label for="username">Username:</label><br>
                 <input type="text" id="username" name="username"><br>
                 <label for="pw">Password:</label><br>
-                <input type="password" id="pw" name="pw"><br>
-                <input type="submit" value="Login">
+                <input type="password" id="pw" name="pw"><br> -->
+                <input type="submit" value="Login"> 
             </form>
-            <p>Not registered yet? Register </p><a href="{% url 'register' %}">here</a>
+            Not registered yet? Register <a href="{% url 'register' %}">here</a>
         </div>
         {% endif %}
     </div>

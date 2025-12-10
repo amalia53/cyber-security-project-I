@@ -8,6 +8,8 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     path('register/', views.register, name='register'),
-    path('<str:user_username>/userpage', views.userpage, name='userpage'),
+    path('userpage/<str:username>/', views.userpage, name='userpage'),
     path('post/', views.post, name='post'),
+    path('delete/<int:bubble_id>/', views.delete_bubble, name='delete_bubble'),
+    path('changepw/', views.changepw, name='changepw'),
 ]   

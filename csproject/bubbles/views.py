@@ -1,28 +1,33 @@
 from django.shortcuts import render, redirect
 from django.template import loader
+from datetime import datetime
 from .models import Bubble, User
+from .forms import RegistrationForm, LoginForm, ChangePwForm, PostForm
 
 def index(request):
-    bubbles = Bubble.objects.all()
-    if "user" in request.session:
-        user = request.session['user']
-    else:
-        user = "guest"
-    context = {'bubbles' : bubbles, 'user' : user}
+    context = {
+        'bubbles' : Bubble.objects.all().order_by('-pub_time'), 
+        'user' : request.session['user'] if 'user' in request.session else 'guest', 
+        'login_form': LoginForm(),
+        'post_form': PostForm()
+        }
     return render(request, 'bubbles/index.html', context)
 
 def login(request):
     if request.method == 'POST':
-        username = request.POST.get("username")
-        password = request.POST.get("pw")
-
-        get_user = User.objects.filter(username=username, password=password)
-        if get_user:
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = request.POST.get("username")
             request.session['user'] = username
-            print(request.session['user'])
-        else:
-            return redirect('register')
-        return redirect('index')
+            return redirect('index')
+        context = {
+            'bubbles' : Bubble.objects.all().order_by('-pub_time'),
+            'user': 'guest',
+            'login_form': form,
+            'post_form' : PostForm()
+            }
+        return render(request, 'bubbles/index.html', context)
+    return redirect('index')
 
 def logout(request):
     request.session['user'] = 'guest'
@@ -30,27 +35,66 @@ def logout(request):
 
 def register(request):  
     if request.method == 'POST':
-        username = request.POST.get("username").lower()
-        password = request.POST.get("pw")
-        user = User(username=username,password=password)
-        user.save()
-        request.session['user'] = username
-        return redirect('index')
-    else:
-        return render(request, 'bubbles/register.html')
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = request.POST.get("username")
+            request.session['user'] = username
+            return redirect('index')
+        return render(request, 'bubbles/register.html', {'form': form})        
+    form = RegistrationForm()
+    return render(request, 'bubbles/register.html', {'form': form})
 
 
-def userpage(request, user_username):
+def userpage(request, username):
     try:
-        user = User.objects.get(username=user_username)
-        # user = User.objects.get(username=request.session['user'])
-        bubbles = user.bubbles.all()
-        context = {'user_bubbles' :  bubbles, 'user' : user_username}
+        user = User.objects.get(username=username)
+        # user = User.objects.get(username=request.session['user']
+        context = {
+            'user_bubbles' :  user.bubbles.all().order_by('-pub_time'), 
+            'user' : user,
+            'post_form' : PostForm(),
+            'change_pw_form' : ChangePwForm(),
+            }
         return render(request, 'bubbles/userpage.html', context)
     except:
         return redirect('index')
 
-
 def post(request):
-    return render(request)
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            bubble = form.save(commit=False)
+            bubble.author = User.objects.get(username=request.session['user'])
+            bubble.pub_time = datetime.now()
+            bubble.save()
+            user = bubble.author
+            # user = request.session['user']
+            return redirect('userpage', user)
+        return redirect('index')
+    
+def delete_bubble(request, bubble_id):
+    bubble = Bubble.objects.get(id=bubble_id)
+    user = bubble.author
+    # user = request.session['user']
+    bubble.delete()
+    return redirect('userpage', user)
+        
 
+def changepw(request):
+    if request.method == 'POST':
+        form = ChangePwForm(request.POST)
+        user = User.objects.get(username=request.session['user'])
+        if form.is_valid():
+            user_to_update = form.save(commit=False)
+            user_to_update.save()
+            return redirect('userpage', request.session['user'])
+        context = {
+            'user_bubbles' :  user.bubbles.all().order_by('-pub_time'), 
+            'user' : user.username,
+            'post_form' : PostForm(),
+            'change_pw_form' : form,
+            }
+        return render(request, 'bubbles/userpage.html', context)
+
+    

@@ -1,10 +1,9 @@
 from django.db import models
 
-from django.db import models
+from django import forms
 
 class User(models.Model):
     username = models.CharField(max_length=15)
-
     password = models.CharField(max_length=20)
     # Fix the invulnerability by hashing password in the database
     # password = models. hashed?
@@ -20,3 +19,5 @@ class Bubble(models.Model):
 
     def __str__(self):
         return self.bubble_text
+    
+            
